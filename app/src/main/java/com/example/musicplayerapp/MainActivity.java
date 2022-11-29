@@ -45,6 +45,11 @@ public class MainActivity extends AppCompatActivity {
 
         seekBar = findViewById(R.id.seekBar);
 
+        // media player
+        mediaPlayer = MediaPlayer.create(this, R.raw.down_from_the_sky);
+
+        seekBar.setClickable(false);
+
 
 
     }
