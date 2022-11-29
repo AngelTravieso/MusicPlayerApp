@@ -13,15 +13,23 @@ import android.widget.Toast;
 
 import java.util.concurrent.TimeUnit;
 
+// info Handler, Runnable (https://es.stackoverflow.com/questions/38201/diferencia-entre-runnable-handler-thread)
+
 public class MainActivity extends AppCompatActivity {
 
-    // declaring widgets
+    // declarando widgets
     Button backBtn, playBtn, pauseBtn, forwardBtn;
-    TextView titleText, timeText;
+    TextView titleText, currentTimeText, totalTimeText;
     SeekBar seekBar;
 
     // Media Player
     MediaPlayer mediaPlayer;
+
+    /**
+     * Handler (internamente usa un Thread) permite enviar y procesar objetos (Message y Runnables asociados con MessageQueue de un thread) mensajes entre 2 subprocesos de manera segura,
+     * esto significa que el hilo de envío pone el mensaje en la cola de subprocesos
+     * de destino y esta cola de destino procesará este mensaje en su momento apropiado.
+     */
 
     // Handlers
     Handler handler = new Handler();
@@ -39,22 +47,28 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // initialize widgets
+        // inicializar widgets
         backBtn = findViewById(R.id.back_btn);
         playBtn = findViewById(R.id.play_btn);
         pauseBtn = findViewById(R.id.pause_btn);
         forwardBtn = findViewById(R.id.forward_btn);
 
         titleText = findViewById(R.id.song_title);
-        timeText = findViewById(R.id.time_left_text);
+        currentTimeText = findViewById(R.id.current_time_text);
+        totalTimeText = findViewById(R.id.total_time_text);
 
         seekBar = findViewById(R.id.seekBar);
 
-        // media player
+        // inicializar objeto mediaPlayer con el nombre del recurso dado, en este caso la canción
         mediaPlayer = MediaPlayer.create(this, R.raw.down_from_the_sky);
 
+        System.out.println(getResources().getIdentifier(
+                "down_from_the_sky",
+                "raw",
+                getPackageName()
+        ));
 
-        // set the title for the music
+        // setear el título de la canción
         titleText.setText(getResources().getIdentifier(
                 "down_from_the_sky",
                 "raw",
@@ -62,29 +76,35 @@ public class MainActivity extends AppCompatActivity {
         ));
 
 
-        seekBar.setClickable(false);
+        /*seekBar.setClickable(false);*/
+        seekBar.setClickable(true);
 
-        // Adding functionalities for the buttons
+        // Agregando funcionalidad de los botones
 
-        // play the music
+        // play a la canción
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "Playing...", Toast.LENGTH_SHORT).show();
                 playMusic();
             }
         });
 
+        /**
+         * pause(): Pausa la canción actual
+         */
 
-        // pause the music
+        // pausar la canción
         pauseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "Paused song...", Toast.LENGTH_SHORT).show();
                 mediaPlayer.pause();
             }
         });
 
 
-        // advance the music 10seconds
+        // avanzar 10seg a la canción
         forwardBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        // rewind the music 10seconds
+        // retroceder 10seg de la canción
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,9 +138,25 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        handler.removeCallbacks(updateSongTime);
+        /*mediaPlayer.stop();
+        mediaPlayer.reset();*/
+        mediaPlayer.release();
+
+        mediaPlayer = null;
+    }
+
     // start play the music
     private void playMusic() {
         mediaPlayer.start();
+
+        /**
+         * getDuration(): Obtener la duración total de una canción en milisegundos (ms)
+         */
 
         finalTime = mediaPlayer.getDuration();
         startTime = mediaPlayer.getCurrentPosition();
@@ -130,12 +166,18 @@ public class MainActivity extends AppCompatActivity {
             oneTimeOnly = 1;
         }
 
-        timeText.setText(String.format(
-                "%d min, %d sec",
+        currentTimeText.setText(String.format(
+                "%d min:%d sec",
                 TimeUnit.MILLISECONDS.toMinutes((long) finalTime),
                 TimeUnit.MILLISECONDS.toSeconds((long) finalTime) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) finalTime))
 
+        ));
+
+        totalTimeText.setText(String.format("%d min:%d sec",
+                TimeUnit.MILLISECONDS.toMinutes((long) finalTime),
+                TimeUnit.MILLISECONDS.toSeconds((long) finalTime) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) finalTime))
         ));
 
         seekBar.setProgress((int) startTime);
@@ -143,12 +185,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // Creating the runnable for update the song
+    // Creando el objeto runnable para actualizar la canción
     private Runnable updateSongTime = new Runnable() {
         @Override
         public void run() {
             startTime = mediaPlayer.getCurrentPosition();
-            timeText.setText(String.format("%d min, %d sec",
+            currentTimeText.setText(String.format(
+                    "%d min:%d sec",
                     TimeUnit.MILLISECONDS.toMinutes((long) startTime),
                     TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) startTime))
