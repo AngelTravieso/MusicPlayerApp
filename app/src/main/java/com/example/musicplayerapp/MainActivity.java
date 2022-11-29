@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         pauseBtn = findViewById(R.id.pause_btn);
         forwardBtn = findViewById(R.id.forward_btn);
 
-        titleText = findViewById(R.id.text_view);
+        titleText = findViewById(R.id.song_title);
         timeText = findViewById(R.id.time_left_text);
 
         seekBar = findViewById(R.id.seekBar);
@@ -53,10 +53,18 @@ public class MainActivity extends AppCompatActivity {
         // media player
         mediaPlayer = MediaPlayer.create(this, R.raw.down_from_the_sky);
 
+
+        // set the title for the music
+        titleText.setText(getResources().getIdentifier(
+                "down_from_the_sky",
+                "raw",
+                getPackageName()
+        ));
+
+
         seekBar.setClickable(false);
 
         // Adding functionalities for the buttons
-
 
         // play the music
         playBtn.setOnClickListener(new View.OnClickListener() {
@@ -71,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
         pauseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 mediaPlayer.pause();
             }
         });
