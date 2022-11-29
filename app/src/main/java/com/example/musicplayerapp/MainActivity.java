@@ -1,7 +1,9 @@
 package com.example.musicplayerapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -60,17 +62,17 @@ public class MainActivity extends AppCompatActivity {
         seekBar = findViewById(R.id.seekBar);
 
         // inicializar objeto mediaPlayer con el nombre del recurso dado, en este caso la canción
-        mediaPlayer = MediaPlayer.create(this, R.raw.down_from_the_sky);
+        mediaPlayer = MediaPlayer.create(this, R.raw.astronaut);
 
         System.out.println(getResources().getIdentifier(
-                "down_from_the_sky",
+                "astronaut",
                 "raw",
                 getPackageName()
         ));
 
         // setear el título de la canción
         titleText.setText(getResources().getIdentifier(
-                "down_from_the_sky",
+                "astronaut",
                 "raw",
                 getPackageName()
         ));
@@ -85,8 +87,10 @@ public class MainActivity extends AppCompatActivity {
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Playing...", Toast.LENGTH_SHORT).show();
-                playMusic();
+                if(!mediaPlayer.isPlaying()) {
+                    Toast.makeText(MainActivity.this, "Playing...", Toast.LENGTH_SHORT).show();
+                    playMusic();
+                }
             }
         });
 
@@ -98,8 +102,10 @@ public class MainActivity extends AppCompatActivity {
         pauseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Paused song...", Toast.LENGTH_SHORT).show();
-                mediaPlayer.pause();
+                if(mediaPlayer.isPlaying()) {
+                    Toast.makeText(MainActivity.this, "Paused song...", Toast.LENGTH_SHORT).show();
+                    mediaPlayer.pause();
+                }
             }
         });
 
@@ -135,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     @Override
@@ -167,14 +172,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         currentTimeText.setText(String.format(
-                "%d min:%d sec",
+                "%d:%d",
                 TimeUnit.MILLISECONDS.toMinutes((long) finalTime),
                 TimeUnit.MILLISECONDS.toSeconds((long) finalTime) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) finalTime))
 
         ));
 
-        totalTimeText.setText(String.format("%d min:%d sec",
+        totalTimeText.setText(String.format(
+                "%d:%d",
                 TimeUnit.MILLISECONDS.toMinutes((long) finalTime),
                 TimeUnit.MILLISECONDS.toSeconds((long) finalTime) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) finalTime))
@@ -191,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             startTime = mediaPlayer.getCurrentPosition();
             currentTimeText.setText(String.format(
-                    "%d min:%d sec",
+                    "%d:%d",
                     TimeUnit.MILLISECONDS.toMinutes((long) startTime),
                     TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) startTime))

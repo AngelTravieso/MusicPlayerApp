@@ -76,7 +76,7 @@
 
     <SeekBar
         android:id="@+id/seekBar"
-        android:layout_width="212dp"
+        android:layout_width="200dp"
         android:layout_height="19dp"
         android:layout_marginTop="72dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -90,6 +90,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="72dp"
         android:text="@string/start_time_text"
+        android:textSize="16dp"
         app:layout_constraintEnd_toStartOf="@+id/seekBar"
         app:layout_constraintHorizontal_bias="0.444"
         app:layout_constraintStart_toStartOf="parent"
@@ -101,6 +102,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="72dp"
         android:text="@string/final_time_text"
+        android:textSize="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.555"
         app:layout_constraintStart_toEndOf="@+id/seekBar"
